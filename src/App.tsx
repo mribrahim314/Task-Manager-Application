@@ -1,72 +1,52 @@
-import React, { useState, useEffect } from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import Task from "./types";
-import TaskItem from "./TaskItem";
-import AddTaskForm from "./AddTaskForm";
+import React from "react";
+import AddTaskForm from "./components/AddTaskForm";
+import TaskMenu from "./components/TaskMenu";
+
 import {
-  Button,
-  TextField,
-  Box,
   Container,
-  Card,
   Typography,
-  colors,
   ThemeProvider,
   createTheme,
+  CssBaseline,
 } from "@mui/material";
-import TaskMenu from "./TaskMenu";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import useTaskManager from "./components/useTaskManager";
 
 const theme = createTheme({
   palette: {
     primary: {
       main: "#1976d2",
     },
+    secondary: {
+      main: "#f50057",
+    },
+    background: {
+      default: "#f5f5f5",
+      paper: "#ffffff",
+    },
   },
 });
 
 const TaskManager: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskDescription, setNewTaskDescription] = useState("");
-
-  useEffect(() => {
-    const savedTasks = localStorage.getItem("tasks");
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
+  const { tasks, addTask, editTask,setTasks, deleteTask } = useTaskManager();
 
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <Typography
-          variant="h1"
-          align="center"
-          color={"primary"}
-          sx={{ mt: 3 }}
-        >
+    <ThemeProvider theme={theme}>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <CssBaseline />
+        <Typography variant="h2" align="center" color="primary" sx={{ mt: 3 }}>
           Task Manager
         </Typography>
-        <Typography variant="h5" align="center" sx={{ mb: 8 }}>
+        <Typography variant="h5" align="center" sx={{ mb: 4 }}>
           Organize your work and life
         </Typography>
-        <Container maxWidth="sm">
-          <AddTaskForm
-            newTaskTitle={newTaskTitle}
-            setNewTaskTitle={setNewTaskTitle}
-            newTaskDescription={newTaskDescription}
-            setNewTaskDescription={setNewTaskDescription}
-            tasks={tasks}
-            setTasks={setTasks}
-          />
-          <TaskMenu tasks={tasks} setTasks={setTasks} />
+        <Container maxWidth="md">
+          <AddTaskForm addTask={addTask} />
+          <TaskMenu tasks={tasks} editTask={editTask} deleteTask={deleteTask} setTasks={setTasks} />
         </Container>
-      </ThemeProvider>
-    </>
+      </LocalizationProvider>
+    </ThemeProvider>
   );
 };
 
